@@ -12,7 +12,10 @@ import {
   StyleSheet,
   Text,
   View,
-  Image
+  Image,
+  Menu,
+  ScrollView,
+  TouchableHighlight,
 } from 'react-native';
 
 import TabNavigator from 'react-native-tab-navigator';
@@ -20,6 +23,10 @@ import NavigationBar from 'react-native-navbar';
 import Swiper from 'react-native-swiper';
 import Banner from 'react-native-banner';
 
+import SideMenu from 'react-native-side-menu';
+import ScrollableTabView from 'react-native-scrollable-tab-view';
+
+import GiftedListView from 'react-native-gifted-listview';
 
 var MOCKED_MOVIES_DATA = [{
   title: 'Title',
@@ -31,6 +38,124 @@ var MOCKED_MOVIES_DATA = [{
 
 var REQUEST_URL = 'https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json';
 var movie = MOCKED_MOVIES_DATA[0];
+
+
+class Example extends Component {
+  /**
+   * Will be called when refreshing
+   * Should be replaced by your own logic
+   * @param {number} page Requested page to fetch
+   * @param {function} callback Should pass the rows
+   * @param {object} options Inform if first load
+   */
+  _onFetch(page = 1, callback, options) {
+    setTimeout(() => {
+      var rows = ['row '+((page - 1) * 5 + 1), 'row '+((page - 1) * 5 + 2), 'row '+((page - 1) * 5 + 3),'row '+((page - 1) * 5 + 4),'row '+((page - 1) * 5 + 5),'row '+((page - 1) * 5 + 1), 'row '+((page - 1) * 5 + 2), 'row '+((page - 1) * 5 + 3),'row '+((page - 1) * 5 + 4),'row '+((page - 1) * 5 + 5),'row '+((page - 1) * 5 + 1), 'row '+((page - 1) * 5 + 2), 'row '+((page - 1) * 5 + 3),'row '+((page - 1) * 5 + 4),'row '+((page - 1) * 5 + 5)];
+      if (page === 10) {
+        callback(rows, {
+          allLoaded: true, // the end of the list is reached
+        });        
+      } else {
+        callback(rows);
+      }
+    }, 1000); // simulating network fetching
+  }
+
+  /**
+   * When a row is touched
+   * @param {object} rowData Row data
+   */
+  _onPress(rowData) {
+    console.log(rowData+' pressed');
+  }
+
+  /**
+   * Render a row
+   * @param {object} rowData Row data
+   */
+  _renderRowView(rowData) {
+    return (
+      <TouchableHighlight
+        style={styles.row}
+        underlayColor='#c8c7cc'
+        // onPress={() => this._onPress(rowData)}
+      >  
+        <Text>{rowData}</Text>
+      </TouchableHighlight>
+    );
+  }
+
+  _renderRefreshableFetchingView(){
+    alert('renderRefreshableFetchingView')
+  }
+
+  _renderRefreshableWillRefreshView(){
+    alert('renderRefreshableWillRefreshView')
+  }
+
+  _renderRefreshableWaitingView(){
+    alert('renderRefreshableWaitingView')
+
+  }
+  render() {    
+    return (
+      <View style={styles.container}>
+        <View style={styles.navBar} />
+        <GiftedListView
+          rowView={this._renderRowView}
+          onFetch={this._onFetch}
+          initialListSize={12}
+          firstLoader={true} // display a loader for the first fetching
+          pagination={true} // enable infinite scrolling using touch to load more
+          // paginationFetchigView={this._renderRefreshableFetchingView}
+          // paginationAllLoadedView={this._renderRefreshableWillRefreshView}
+          // paginationWaitingView={this._renderRefreshableWaitingView}
+
+          refreshable={true} // enable pull-to-refresh for iOS and touch-to-refresh for Android
+          withSections={false} // enable sections
+          // refreshableViewHeight={50} // correct height is mandatory
+          // refreshableDistance={40}
+          // refreshableFetchingView={this._renderRefreshableFetchingView}
+          // refreshableWillRefreshView={this._renderRefreshableWillRefreshView}
+          // refreshableWaitingView={this._renderRefreshableWaitingView}
+
+          customStyles={{
+            paginationView: {
+              backgroundColor: '#eee',
+            },
+          }}
+
+          refreshableTintColor="#ccc"
+        />
+      </View>
+    );
+  }
+};
+// 滑动标签
+class ScrollableTab extends Component {
+  render() {
+    return (
+      <ScrollableTabView tabBarUnderlineColor='#2AADE4' tabBarBackgroundColor='#3076B0' tabBarActiveTextColor='#2AADE4' tabBarInactiveTextColor='#ffffff'>
+        <ScrollView tabLabel="当前热点" style={styles.tabView}>
+          <View style={styles.card}>
+            <Text>Notifications</Text>
+          </View>
+        </ScrollView>
+        <ScrollView tabLabel="每日热点" style={styles.tabView}>
+          <View style={styles.card}>
+            <Text>Notifications</Text>
+          </View>
+        </ScrollView>
+        <ScrollView tabLabel="榜单热点" style={styles.tabView}>
+          <View style={styles.card}>
+            <Text>Notifications</Text>
+          </View>
+        </ScrollView>
+      </ScrollableTabView>
+    );
+  }
+}
+
 
 class TabHome extends Component {
   render() {
@@ -47,17 +172,18 @@ class SwiperBanner extends Component {
   constructor(props) {
     super(props);
 
+    // 轮播图
     this.banners = [{
-      title: 'beauty 1',
+      title: '榜单新闻一',
       image: 'http://static.open-open.com/news/uploadImg/20150204/20150204212635_429.png',
     }, {
-      title: 'beauty 2',
+      title: '榜单新闻二',
       image: 'http://static.open-open.com/news/uploadImg/20150204/20150204212635_429.png',
     }, {
-      title: 'The next banner has no title',
+      title: '榜单新闻三',
       image: 'http://static.open-open.com/news/uploadImg/20150204/20150204212635_429.png',
     }, {
-      // title: 'no title',
+      title: '榜单新闻四',
       image: 'http://static.open-open.com/news/uploadImg/20150204/20150204212635_429.png',
     }, ];
 
@@ -84,14 +210,6 @@ class SwiperBanner extends Component {
   }
 
   render() {
-    const rightButtonConfig = {
-      title: 'Next',
-      handler: () => alert('hello!'),
-    };
-
-    const titleConfig = {
-      title: 'Hello, world',
-    };
 
     return (
 
@@ -107,7 +225,8 @@ class SwiperBanner extends Component {
   }
 }
 
-class AwesomeApp extends Component {
+// 底部标签
+class Application extends Component {
 
   constructor(props) {
     super(props);
@@ -117,61 +236,111 @@ class AwesomeApp extends Component {
     this.state = {
       clickTitle: 'You can try clicking beauty',
       defaultIndex: 0,
-      selectedTab: 'home',
+      selectedTab: 'wb',
     }
 
     this.defaultIndex = 0;
   }
 
   render() {
-    const rightButtonConfig = {
-      title: 'Next',
-      handler: () => alert('hello!'),
-    };
 
-    const titleConfig = {
-      title: 'Hello, world',
-    };
 
     return (
       <View style={styles.container}>
-          <NavigationBar title={titleConfig} rightButton={rightButtonConfig} />
             <TabNavigator>
               <TabNavigator.Item
-                selected={this.state.selectedTab === 'home'}
-                title="Home"
-                renderIcon={() => <Image source={{uri: movie.posters.thumbnail}} />}
-                renderSelectedIcon={() => <Image source={{uri: movie.posters.thumbnail}} />}
-                badgeText="1"
-                onPress={() => this.setState({ selectedTab: 'home' })}>
+                selected={this.state.selectedTab === 'wb'}
+                title="微博"
+                titleStyle={styles.bottomTabTitle}
+                tabStyle={styles.bottomTab}
+                selectedTitleStyle={styles.selectedTitle}
+                // renderIcon={() => <Image source={{uri: movie.posters.thumbnail}} />}
+                // renderSelectedIcon={() => <Image source={{uri: movie.posters.thumbnail}} />}
+                onPress={() => this.setState({ selectedTab: 'wb' })}>
                 <SwiperBanner/>
               </TabNavigator.Item>
 
               <TabNavigator.Item
-                selected={this.state.selectedTab === 'profile'}
-                title="Profile"
-                renderIcon={() => <Image source={{uri: movie.posters.thumbnail}} />}
-                renderSelectedIcon={() => <Image source={{uri: movie.posters.thumbnail}} />}
-                badgeText="2"
-                onPress={() => this.setState({ selectedTab: 'profile' })}>
-                <TabHome/>
+                selected={this.state.selectedTab === 'wc'}
+                title="微信"
+                titleStyle={styles.bottomTabTitle}
+                tabStyle={styles.bottomTab}
+                selectedTitleStyle={styles.selectedTitle}
+                // renderIcon={() => <Image source={{uri: movie.posters.thumbnail}} />}
+                // renderSelectedIcon={() => <Image source={{uri: movie.posters.thumbnail}} />}
+                onPress={() => this.setState({ selectedTab: 'wc' })}>
+                <ScrollableTab/>
               </TabNavigator.Item>
-              
+
               <TabNavigator.Item
                 selected={this.state.selectedTab === 'other'}
-                title="other"
-                renderIcon={() => <Image source={{uri: movie.posters.thumbnail}} />}
-                renderSelectedIcon={() => <Image source={{uri: movie.posters.thumbnail}} />}
-                badgeText="3"
+                title="解读"
+                titleStyle={styles.bottomTabTitle}
+                tabStyle={styles.bottomTab}
+                selectedTitleStyle={styles.selectedTitle}
+                // renderIcon={() => <Image source={{uri: movie.posters.thumbnail}} />}
+                // renderSelectedIcon={() => <Image source={{uri: movie.posters.thumbnail}} />}
                 onPress={() => this.setState({ selectedTab: 'other' })}>
-                <TabHome/>
+                <Example/>
               </TabNavigator.Item>
             </TabNavigator>
         </View>
     );
   }
+}
 
 
+// 侧边栏
+class AwesomeApp extends Component {
+  state = {
+    isOpen: false,
+    selectedItem: 'About',
+  };
+
+  toggle() {
+    this.setState({
+      isOpen: !this.state.isOpen,
+    });
+  }
+
+  updateMenuState(isOpen) {
+    this.setState({
+      isOpen,
+    });
+  }
+
+  onMenuItemSelected = (item) => {
+    this.setState({
+      isOpen: true,
+      selectedItem: item,
+    });
+  }
+
+  render() {
+    // const menu = <Menu navigator={navigator}/>;
+
+    const menu = <View style={styles.slide}><Text style={styles.title}>{movie.title}</Text></View>;
+
+    const leftButtonConfig = {
+      title: 'menu',
+      handler: () => this.toggle(),
+    };
+
+    const titleConfig = {
+      title: '新媒体榜单',
+    };
+
+    return (
+      <SideMenu
+        style={styles.slide}
+        menu={menu}
+        isOpen={this.state.isOpen}
+        onChange={(isOpen) => this.updateMenuState(isOpen)}>
+        <NavigationBar title={{ title: '新媒体榜单','tintColor':'#fff' }} style={styles.navigation} leftButton={<Image source={require('./images/icon-menu.png')} style={styles.icon}/>}/>
+        <Application/>
+      </SideMenu>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
@@ -191,25 +360,17 @@ const styles = StyleSheet.create({
   },
   slide1: {
     flex: 1,
-    // justifyContent: 'center',
-    // alignItems: 'center',
     backgroundColor: '#9DD6EB',
   },
   slide2: {
-    // flex: 1,
-    // justifyContent: 'center',
-    // alignItems: 'center',
     backgroundColor: '#97CAE5',
   },
   slide3: {
-    // flex: 1,
-    // justifyContent: 'center',
-    // alignItems: 'center',
     backgroundColor: '#92BBD9',
   },
   rightContainer: {
     // flex:1,
-    backgroundColor: "#ccc",
+    backgroundColor: "#cccccc",
     justifyContent: 'center',
     // flexDirection: 'row',
     alignItems: 'center',
@@ -226,13 +387,43 @@ const styles = StyleSheet.create({
     width: 100,
     height: 81,
   },
-
-
-  // text: {
-  //   color: '#fff',
-  //   fontSize: 30,
-  //   fontWeight: 'bold',
-  // }
+  slide: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#cccccc',
+  },
+  // 顶部
+  icon:{
+    width: 30,
+    height: 30,
+    marginTop:6,
+    marginLeft:6,
+  },
+  navigation:{
+    backgroundColor:'#3076B0',
+  },
+  // 底部标签
+  bottomTabTitle:{
+    fontSize:16,
+    height:30,
+    color:'#fff',
+  },
+  selectedTitle:{
+    color:'#2AADE4',
+  },
+  bottomTab:{
+    backgroundColor:'#3076B0',
+  },
+  // 滑动标签
+  tabBarText:{
+    color:'#ffffff',
+  },
+  // 下拉刷新
+  row: {
+    padding: 10,
+    height: 44,
+  },
 });
 
 AppRegistry.registerComponent('AwesomeApp', () => AwesomeApp);

@@ -15,6 +15,7 @@ import {
   Image,
   Menu,
   ScrollView,
+  TouchableHighlight,
 } from 'react-native';
 
 import TabNavigator from 'react-native-tab-navigator';
@@ -24,6 +25,8 @@ import Banner from 'react-native-banner';
 
 import SideMenu from 'react-native-side-menu';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
+
+import GiftedListView from 'react-native-gifted-listview';
 
 var MOCKED_MOVIES_DATA = [{
   title: 'Title',
@@ -36,6 +39,98 @@ var MOCKED_MOVIES_DATA = [{
 var REQUEST_URL = 'https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json';
 var movie = MOCKED_MOVIES_DATA[0];
 
+
+class Example extends Component {
+  /**
+   * Will be called when refreshing
+   * Should be replaced by your own logic
+   * @param {number} page Requested page to fetch
+   * @param {function} callback Should pass the rows
+   * @param {object} options Inform if first load
+   */
+  _onFetch(page = 1, callback, options) {
+    setTimeout(() => {
+      var rows = ['row '+((page - 1) * 5 + 1), 'row '+((page - 1) * 5 + 2), 'row '+((page - 1) * 5 + 3),'row '+((page - 1) * 5 + 4),'row '+((page - 1) * 5 + 5),'row '+((page - 1) * 5 + 1), 'row '+((page - 1) * 5 + 2), 'row '+((page - 1) * 5 + 3),'row '+((page - 1) * 5 + 4),'row '+((page - 1) * 5 + 5),'row '+((page - 1) * 5 + 1), 'row '+((page - 1) * 5 + 2), 'row '+((page - 1) * 5 + 3),'row '+((page - 1) * 5 + 4),'row '+((page - 1) * 5 + 5)];
+      if (page === 10) {
+        callback(rows, {
+          allLoaded: true, // the end of the list is reached
+        });        
+      } else {
+        callback(rows);
+      }
+    }, 1000); // simulating network fetching
+  }
+
+  /**
+   * When a row is touched
+   * @param {object} rowData Row data
+   */
+  _onPress(rowData) {
+    console.log(rowData+' pressed');
+  }
+
+  /**
+   * Render a row
+   * @param {object} rowData Row data
+   */
+  _renderRowView(rowData) {
+    return (
+      <TouchableHighlight
+        style={styles.row}
+        underlayColor='#c8c7cc'
+        // onPress={() => this._onPress(rowData)}
+      >  
+        <Text>{rowData}</Text>
+      </TouchableHighlight>
+    );
+  }
+
+  _renderRefreshableFetchingView(){
+    alert('renderRefreshableFetchingView')
+  }
+
+  _renderRefreshableWillRefreshView(){
+    alert('renderRefreshableWillRefreshView')
+  }
+
+  _renderRefreshableWaitingView(){
+    alert('renderRefreshableWaitingView')
+
+  }
+  render() {    
+    return (
+      <View style={styles.container}>
+        <View style={styles.navBar} />
+        <GiftedListView
+          rowView={this._renderRowView}
+          onFetch={this._onFetch}
+          initialListSize={12}
+          firstLoader={true} // display a loader for the first fetching
+          pagination={true} // enable infinite scrolling using touch to load more
+          // paginationFetchigView={this._renderRefreshableFetchingView}
+          // paginationAllLoadedView={this._renderRefreshableWillRefreshView}
+          // paginationWaitingView={this._renderRefreshableWaitingView}
+
+          refreshable={true} // enable pull-to-refresh for iOS and touch-to-refresh for Android
+          withSections={false} // enable sections
+          // refreshableViewHeight={50} // correct height is mandatory
+          // refreshableDistance={40}
+          // refreshableFetchingView={this._renderRefreshableFetchingView}
+          // refreshableWillRefreshView={this._renderRefreshableWillRefreshView}
+          // refreshableWaitingView={this._renderRefreshableWaitingView}
+
+          customStyles={{
+            paginationView: {
+              backgroundColor: '#eee',
+            },
+          }}
+
+          refreshableTintColor="#ccc"
+        />
+      </View>
+    );
+  }
+};
 // 滑动标签
 class ScrollableTab extends Component {
   render() {
@@ -186,7 +281,7 @@ class Application extends Component {
                 // renderIcon={() => <Image source={{uri: movie.posters.thumbnail}} />}
                 // renderSelectedIcon={() => <Image source={{uri: movie.posters.thumbnail}} />}
                 onPress={() => this.setState({ selectedTab: 'other' })}>
-                <TabHome/>
+                <Example/>
               </TabNavigator.Item>
             </TabNavigator>
         </View>
@@ -323,7 +418,12 @@ const styles = StyleSheet.create({
   // 滑动标签
   tabBarText:{
     color:'#ffffff',
-  }
+  },
+  // 下拉刷新
+  row: {
+    padding: 10,
+    height: 44,
+  },
 });
 
 AppRegistry.registerComponent('AwesomeApp', () => AwesomeApp);
